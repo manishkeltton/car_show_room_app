@@ -1,0 +1,32 @@
+{
+  "theme_color": "#47ccde;",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "scope": "/",
+  "start_url": "/",
+  "name": "car_showcase_app",
+  "short_name": "Next-PWA",
+  "description": "A Demo for car_showcase_app",
+  "icons": [
+    {
+      "src": "/car-logo.svg",
+      "sizes": "192x192",
+      "type": "image/svg"
+    },
+    {
+      "src": "/car-logo.svg",
+      "sizes": "256x256",
+      "type": "image/svg"
+    },
+    {
+      "src": "/car-logo.svg",
+      "sizes": "384x384",
+      "type": "image/svg"
+    },
+    {
+      "src": "/car-logo.svg",
+      "sizes": "512x512",
+      "type": "image/svg"
+    }
+  ]
+}
