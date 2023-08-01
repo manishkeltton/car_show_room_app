@@ -1,27 +1,27 @@
 "use client"
 
-import { CarCard, Hero, ShowMore } from '@/components'
+import { CarCard, Hero } from '@/components'
 import CustomFilter from '@/components/CustomFilter'
 import Pagination from '@/components/Pagination'
 import SearchBar from '@/components/SearchBar'
 import { fuels, yearsOfProduction } from '@/constants'
 import { HomeProps } from '@/types'
 import { fetchCars } from '@/utils'
-import Image from 'next/image'
 import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { carCurrentPage, carDetailsData, carOffset, carPageCount } from '@/redux/carDetailSlice/carDetailSlice'
 
 export default function Home({ searchParams }: HomeProps) {
+
   const [allCarsData, setAllCarsData] = useState("")
-  const [stateData, setStateData] = useState({
-    offset: 0,
-    data: [],
-    perPage: 5,
-    currentPage: 0,
-    pageCount: 0
-  })
+  const dispatch = useDispatch()
+  const selectData = useSelector((state: any) => state.carData)
   useEffect(() => {
     receivedData()
-  }, [])
+  }, [selectData])
+
+  console.log("selectData => ", selectData);
+
 
   const receivedData = async () => {
 
@@ -32,34 +32,24 @@ export default function Home({ searchParams }: HomeProps) {
       limit: searchParams.limit || 10,
       model: searchParams.model || "",
     });
-    const slice = allCars.slice(stateData.offset, stateData.offset + stateData.perPage)
-    setStateData({
-      ...stateData,
-      pageCount: Math.ceil(allCars.length / stateData.perPage),
-      data: slice
-    })
+    const slice = await allCars.slice(selectData.offset, selectData.offset + selectData.perPage)
+    dispatch(carDetailsData(slice))
+    dispatch(carPageCount(Math.ceil(allCars.length / selectData.perPage)))
     setAllCarsData(allCars)
   }
 
-  const handlePageClick = (e: any) => {
+  const handlePageClick = async (e: any) => {
     const selectedPage = e.selected;
-    const offset = selectedPage * stateData.perPage;
+    const offset = selectedPage * selectData.perPage;
+    dispatch(carCurrentPage(selectedPage))
+    dispatch(carOffset(offset))
 
-    setStateData({
-      ...stateData,
-      currentPage: selectedPage,
-      offset: offset
-    })
-
-    receivedData()
+    await receivedData()
 
   };
 
-
-  console.log("stateData => ", stateData);
-
-  console.log("allCarsData => ", allCarsData);
   const isDataEmpty = !Array.isArray(allCarsData) || allCarsData.length < 1 || !allCarsData;
+
   return (
     <main className="overflow-hidden">
       <Hero />
@@ -80,20 +70,15 @@ export default function Home({ searchParams }: HomeProps) {
         {!isDataEmpty ? (
           <section>
             <div className='home__cars-wrapper'>
-              {stateData?.data?.map((car) => (
+              {selectData?.data?.map((car: any) => (
                 <CarCard car={car} />
               ))}
             </div>
-            {/* <ShowMore
-              pageNumber={(searchParams.limit || 10) / 10}
-              isNext={(searchParams.limit || 10) > allCarsData.length}
-            /> */}
-            <Pagination pageCount={stateData?.pageCount} handlePageClick={handlePageClick} />
+            <Pagination pageCount={selectData?.pageCount} handlePageClick={handlePageClick} />
           </section>
         ) : (
           <div className='home__error-container'>
             <h2 className='text-black text-xl font-bold'>Oops, no results</h2>
-            {/* <p>{allCarsData?.message}</p> */}
           </div>
         )}
       </div>

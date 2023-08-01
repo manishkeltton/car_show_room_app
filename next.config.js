@@ -32,5 +32,5 @@ const nextConfig = {
   },
 };
 
-module.exports = withPWA;
-module.exports = nextConfig;
+// module.exports = withPWA;
+module.exports = withPWA(nextConfig);
